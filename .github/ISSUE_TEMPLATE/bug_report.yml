@@ -1,0 +1,80 @@
+name: Bug report
+description: Something in matterbridge-wyze-robovac-plus isn't working
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Never paste your Wyze password, API key, key ID, `totpKey` or token file** — remove them from anything you attach.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Select "Bedroom" in Apple Home and start cleaning
+        2. ...
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version and commit
+      description: The plugin's first log line shows the release and commit, e.g. `v1.2.0 (2c47ae6)`.
+    validations:
+      required: true
+  - type: input
+    id: matterbridge
+    attributes:
+      label: Matterbridge version and how it runs
+      placeholder: e.g. 3.11.1, as a systemd service
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS, Python and wyze-sdk versions
+      placeholder: e.g. Raspberry Pi OS 11, Python 3.9, wyze-sdk 2.2.0
+    validations:
+      required: true
+  - type: input
+    id: vacuum
+    attributes:
+      label: Vacuum model
+      placeholder: e.g. Wyze Robot Vacuum S200
+  - type: checkboxes
+    id: controllers
+    attributes:
+      label: Where you see the problem
+      options:
+        - label: Apple Home
+        - label: Alexa
+        - label: Google Home
+        - label: SmartThings / Home Assistant / other
+        - label: Matterbridge UI or log only
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Server mode (`enableServerRvc`)
+      options:
+        - "On (default)"
+        - "Off"
+        - Not sure
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        Set Matterbridge's log level to **Debug** (Matterbridge UI → Settings), reproduce the problem, then copy the plugin's lines from the Matterbridge UI's Logs page, from the plugin's first line on. Check that no credentials are in it.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: Screenshots, which rooms or floors were selected, whether it worked in an earlier version, etc.

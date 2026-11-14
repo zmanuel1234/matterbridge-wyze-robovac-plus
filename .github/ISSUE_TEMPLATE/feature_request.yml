@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest an improvement for matterbridge-wyze-robovac-plus
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you'd like to do
+      description: What you're trying to do with the vacuum, and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: How it could work
+      description: Which controller (Apple Home, Alexa, ...) and what you'd expect to see or say.
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: Alternatives you've tried, screenshots, links.

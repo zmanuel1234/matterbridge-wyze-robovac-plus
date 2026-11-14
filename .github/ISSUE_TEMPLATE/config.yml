@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Setup instructions and settings
+    url: https://github.com/zmanuel1234/wyze-robovac-matterbridge#readme
+    about: Requirements, every setting, and how updates work.
