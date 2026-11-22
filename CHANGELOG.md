@@ -80,6 +80,12 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 - The package ships only what the plugin needs (`files` in package.json): compiled code, Python helpers, settings schema, sample config, README, CHANGELOG, LICENSE. No source maps, type declarations or author tooling.
 - Removed the original author's publish script, CODEOWNERS, devcontainer, legacy .eslintrc, unused tsconfig.production.json and donation image.
 
+## [Unreleased]
+
+### ** Changed **
+
+- Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests.
+
 ## [1.2.0] - 2026-11-11
 
 Tested as 1.2.0-dev-1 (same code) with Apple Home and Alexa on a Raspberry Pi. To go back to 1.1.3 later, send the vacuum to its dock first.

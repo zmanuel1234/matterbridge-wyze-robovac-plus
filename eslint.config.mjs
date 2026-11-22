@@ -1,33 +1,53 @@
-// Native flat config (ESLint 10 + typescript-eslint); replaces the old FlatCompat setup.
+// Shared ESLint setup for homebridge-comelit-doorbell, homebridge-ring-secure-video and
+// wyze-robovac-matterbridge: keep the three copies the same apart from the "This repository" block.
+//
+// It checks for bugs, not formatting. TypeScript files get typescript-eslint's type-aware rules,
+// mainly the promise checks: a promise that is neither awaited nor given a .catch() turns a
+// failure into an unhandled rejection, which can stop the whole bridge.
 import js from '@eslint/js';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+// ---- This repository ----
+const tsFiles = ['src/**/*.ts'];
+const ignores = ['dist/**'];
+const extra = [];
+// -------------------------
+
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**'] },
+  { ignores: ['node_modules/**', ...ignores] },
+  { linterOptions: { reportUnusedDisableDirectives: 'error' } },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
-    files: ['src/**/*.ts'],
-    languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
+    // Plain JavaScript (tests, scripts): ESLint's own recommended rules.
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    files: tsFiles,
+    extends: [tseslint.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    },
     rules: {
-      quotes: ['warn', 'single'],
-      indent: ['warn', 2, { SwitchCase: 1 }],
-      semi: ['off'],
-      'comma-dangle': ['warn', 'always-multiline'],
-      'dot-notation': 'off',
-      eqeqeq: 'warn',
-      curly: ['warn', 'all'],
-      'brace-style': ['warn'],
-      'prefer-arrow-callback': ['warn'],
-      'max-len': ['warn', 140],
-      'no-console': ['warn'],
-      'comma-spacing': ['error'],
-      'no-multi-spaces': ['warn', { ignoreEOLComments: true }],
-      'no-trailing-spaces': ['warn'],
-      'lines-between-class-members': ['warn', 'always', { exceptAfterSingleLine: true }],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      // Promises
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      // Not require-await: `async` without `await` is how a function turns its throws into
+      // rejections for callers that use .catch().
+      // Other likely bugs
+      eqeqeq: ['error', 'smart'],
+      'no-console': 'error', // log through the platform's logger
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrors: 'none',
+      }],
+      // Consistency
+      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
+      // Device APIs hand back loosely typed data; `any` is allowed where it's honest.
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+  ...extra,
 );
