@@ -20,16 +20,16 @@
  * limitations under the License.
  */
 
-import { MatterbridgeEndpoint, MatterbridgeDynamicPlatform, PlatformConfig } from 'matterbridge';
+import { type MatterbridgeEndpoint, MatterbridgeDynamicPlatform, type PlatformConfig } from 'matterbridge';
 import { RoboticVacuumCleaner } from 'matterbridge/devices';
-import { AnsiLogger, debugStringify } from 'matterbridge/logger';
+import { type AnsiLogger, debugStringify } from 'matterbridge/logger';
 import { RvcRunMode, PowerSource, ServiceArea, RvcOperationalState, RvcCleanMode } from 'matterbridge/matter/clusters';
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { setTimeout } from 'timers/promises';
-import { PyWorker, PyResult } from './pyWorker.js';
+import { PyWorker, type PyResult } from './pyWorker.js';
 
 
 // What a floor/room run mode cleans. unavailable: listed only so a mode Matter saved stays
@@ -299,7 +299,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       }
     });
 
-    this.roboticVacuum.addCommandHandler('resume', async ({ attributes }) => {
+    this.roboticVacuum.addCommandHandler('resume', ({ attributes }) => {
       this.log.info('\'resume\' handler called - RoboVac');
       const state = opStateOf(attributes);
       if( state !== OS.Paused ) {
@@ -318,7 +318,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       await this.sendHome();
     });
 
-    this.roboticVacuum.addCommandHandler('selectAreas', async ({ request }) => {
+    this.roboticVacuum.addCommandHandler('selectAreas', ({ request }) => {
       const { newAreas } = request as ServiceArea.SelectAreasRequest;
       this.selectedAreas.length = 0; // Clear the array
       for (const area of newAreas) {

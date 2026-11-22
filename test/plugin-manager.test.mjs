@@ -44,6 +44,7 @@ test('Matterbridge\'s plugin manager accepts and adds the packed plugin', () => 
   fs.mkdirSync(home, { recursive: true });
   npm(['install', '--global', '--omit=dev', '--no-fund', '--no-audit', tgz], { NPM_CONFIG_PREFIX: prefix });
   const out = execFileSync(path.join(ROOT, 'node_modules', '.bin', 'matterbridge'), ['-add', 'matterbridge-wyze-robovac-plus', '-homedir', home],
+    // eslint-disable-next-line no-control-regex -- strips the log's ANSI colour codes
     { encoding: 'utf8', env: { ...process.env, HOME: home, NPM_CONFIG_PREFIX: prefix }, timeout: 60_000 }).replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
   assert.match(out, /Added plugin matterbridge-wyze-robovac-plus/, out.split('\n').filter((l) => /PluginManager/.test(l)).join('\n'));
 });

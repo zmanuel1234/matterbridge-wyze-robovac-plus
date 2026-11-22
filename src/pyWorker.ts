@@ -15,7 +15,7 @@
  * @license Apache-2.0
  */
 
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import { spawn, type ChildProcessWithoutNullStreams } from 'child_process';
 import { createInterface } from 'readline';
 
 export interface PyResult { ok : boolean, stdout : string, stderr : string }

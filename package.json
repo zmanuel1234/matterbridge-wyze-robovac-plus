@@ -44,7 +44,7 @@
   "scripts": {
     "dev:matterbridge": "npm install --no-save --ignore-scripts matterbridge@^3.11.1",
     "check:deps": "node -e \"const p=require('./package.json');const bad=['dependencies','devDependencies','peerDependencies','optionalDependencies'].flatMap((t)=>Object.keys(p[t]||{})).filter((n)=>/^(matterbridge|@matterbridge|@matter|@project-chip)/.test(n));if(bad.length){console.error('Matterbridge refuses plugins that list: '+bad.join(', ')+'. Use npm run dev:matterbridge instead.');process.exit(1)}\"",
-    "lint": "eslint src --max-warnings=0",
+    "lint": "eslint . --max-warnings=0",
     "build": "node -e \"for (const p of ['dist','tsconfig.tsbuildinfo']) require('fs').rmSync(p, { recursive: true, force: true })\" && tsc",
     "test": "npm run build && node --test --test-concurrency=1 test/*.test.mjs",
     "test:sdk": "python3 test/sdk_contract.py",
@@ -54,7 +54,8 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",
     "eslint": "^10.14.0",
-    "typescript": "^5.9.3",
+    "globals": "^17.14.0",
+    "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.2"
   },
   "overrides": {

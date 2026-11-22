@@ -1,7 +1,10 @@
-# Dependabot: weekly update PRs for the npm dev tools and the pinned GitHub Actions.
-# Matterbridge and wyze-sdk are not listed in package.json (Matterbridge refuses plugins
-# that depend on it), so they are not covered here: the weekly test run in test.yml
-# checks the newest Matterbridge 3.x and wyze-sdk instead.
+# Shared Dependabot setup for homebridge-comelit-doorbell, homebridge-ring-secure-video and
+# wyze-robovac-matterbridge: keep the three copies the same apart from the "This repository" notes.
+# Weekly update pull requests; CI runs on each one, and each still needs a review before merging.
+#
+# This repository: Matterbridge and wyze-sdk are not in package.json (Matterbridge refuses
+# plugins that list it), so they are not covered here: the weekly scheduled run in test.yml
+# tests the newest Matterbridge 3.x and wyze-sdk instead.
 version: 2
 
 updates:
@@ -13,18 +16,23 @@ updates:
       time: '09:00'
       timezone: America/New_York
     cooldown:
-      default-days: 3            # skip releases younger than 3 days (yanked/compromised versions)
+      default-days: 3            # skip releases younger than 3 days (yanked or compromised versions)
     open-pull-requests-limit: 5
     commit-message:
-      prefix: 'deps(dev)'
+      prefix: deps
+    ignore:
+      # Node's types follow the oldest Node the plugin supports (engines), not the newest Node.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # typescript-eslint supports TypeScript below 6.1 only, and npm can't install a newer
+      # TypeScript next to it. Remove this once a typescript-eslint release supports TypeScript 7.
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
     groups:
-      dev-tools:                 # one PR for minor/patch bumps of eslint, typescript, etc.
+      # Minor and patch bumps of the development tools (TypeScript, ESLint, types) in one PR.
+      dev-tools:
         dependency-type: development
         update-types: [minor, patch]
-    ignore:
-      # Types stay on the oldest Node the plugin supports (engines: Node 22).
-      - dependency-name: '@types/node'
-        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
@@ -36,7 +44,8 @@ updates:
     cooldown:
       default-days: 3
     commit-message:
-      prefix: 'ci'
+      prefix: ci
     groups:
-      actions:                   # one PR for all action bumps; keeps the SHA pins and their # vX comments in step
+      # All action bumps in one PR; Dependabot moves each commit pin and its "# vX" comment together.
+      actions:
         patterns: ['*']

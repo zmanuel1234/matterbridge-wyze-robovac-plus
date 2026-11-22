@@ -20,8 +20,8 @@
  * limitations under the License.
  */
 
-import { MatterbridgeDynamicPlatform, PlatformConfig } from 'matterbridge';
-import { AnsiLogger } from 'matterbridge/logger';
+import { type MatterbridgeDynamicPlatform, type PlatformConfig } from 'matterbridge';
+import { type AnsiLogger } from 'matterbridge/logger';
 
 import { RoboVacMatterbridgeDynamicPlatform } from './platform.js';
 

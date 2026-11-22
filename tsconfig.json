@@ -22,6 +22,8 @@
     "noImplicitAny": true,
     "alwaysStrict": true,
     "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["node"],
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
