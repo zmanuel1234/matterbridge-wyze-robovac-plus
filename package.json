@@ -39,7 +39,7 @@
     "robot vacuum"
   ],
   "engines": {
-    "node": ">=22.0.0 <23.0.0 || >=24.0.0 <25.0.0"
+    "node": "^22.12.0 || ^24.0.0 || ^26.0.0"
   },
   "scripts": {
     "dev:matterbridge": "npm install --no-save --ignore-scripts matterbridge@^3.11.1",

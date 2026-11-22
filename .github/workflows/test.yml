@@ -16,13 +16,14 @@ jobs:
   # Each job runs in Debian with the given Python (GitHub's own Ubuntu machines no longer
   # offer Python 3.9, the version Raspberry Pi OS 11 has).
   plugin:
-    name: Plugin (Node 22, Python ${{ matrix.python }})
+    name: Plugin (Node ${{ matrix.node }}, Python ${{ matrix.python }})
     runs-on: ubuntu-latest
     container: python:${{ matrix.python }}-bookworm
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
+        node: ['22', '24', '26']  # every Node version the plugin supports
         python: ['3.9', '3.12']   # 3.9 is what the Pi runs
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1       # v7.0.1
@@ -30,7 +31,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1     # v7.1.0
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --ignore-scripts --no-fund --no-audit
       - run: npm run dev:matterbridge
