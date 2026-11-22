@@ -34,8 +34,8 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/await-thenable': 'error',
-      'require-await': 'off',
-      '@typescript-eslint/require-await': 'error',
+      // Not require-await: `async` without `await` is how a function turns its throws into
+      // rejections for callers that use .catch().
       // Other likely bugs
       eqeqeq: ['error', 'smart'],
       'no-console': 'error', // log through the platform's logger

@@ -84,7 +84,7 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 
 ### ** Changed **
 
-- Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests. The `resume` and `selectAreas` command handlers are plain functions instead of `async` ones (neither awaited anything).
+- Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests.
 
 ## [1.2.0] - 2026-11-11
 

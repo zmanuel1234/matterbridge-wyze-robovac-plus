@@ -299,7 +299,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       }
     });
 
-    this.roboticVacuum.addCommandHandler('resume', ({ attributes }) => {
+    this.roboticVacuum.addCommandHandler('resume', async ({ attributes }) => {
       this.log.info('\'resume\' handler called - RoboVac');
       const state = opStateOf(attributes);
       if( state !== OS.Paused ) {
@@ -318,7 +318,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       await this.sendHome();
     });
 
-    this.roboticVacuum.addCommandHandler('selectAreas', ({ request }) => {
+    this.roboticVacuum.addCommandHandler('selectAreas', async ({ request }) => {
       const { newAreas } = request as ServiceArea.SelectAreasRequest;
       this.selectedAreas.length = 0; // Clear the array
       for (const area of newAreas) {
