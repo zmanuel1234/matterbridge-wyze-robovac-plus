@@ -84,6 +84,7 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 
 ### ** Changed **
 
+- Supported Node.js: 22 (22.19 or later), 24 and 26, as for the author's Homebridge plugins; Node 26 is newly listed (Matterbridge supports it) and tested in CI with 22 and 24.
 - Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests.
 
 ## [1.2.0] - 2026-11-11

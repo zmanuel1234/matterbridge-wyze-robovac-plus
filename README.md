@@ -29,6 +29,7 @@ Then install the Python part (see Requirements) and fill in the settings.
 ## Requirements
 
 - Python 3.9 or newer, with wyze-sdk ≥ 2.2.0 installed, ideally in its own virtual environment ([wyze-sdk](https://github.com/shauntarves/wyze-sdk)). Tested (in CI) with wyze-sdk 2.2.0 on Python 3.9, as on Raspberry Pi OS 11, and with the newest wyze-sdk on Python 3.12, which has the same login and vacuum code.
+- Node.js 22 (22.19 or later), 24 or 26.
 - Matterbridge ≥ 3.11 ([installation](https://github.com/Luligu/matterbridge/blob/main/README.md)). Earlier releases of this plugin do not start on Matterbridge 3.11.
 - A Wyze API key ID and API key from the [Wyze developer console](https://developer-api-console.wyze.com/#/apikey/view). Any characters are fine; they are never passed through a shell.
 - If your Wyze account uses two-factor authentication, it must use an authenticator app (not SMS), and you need its setup key (see `totpKey` below).
