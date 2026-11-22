@@ -1,0 +1,42 @@
+# Dependabot: weekly update PRs for the npm dev tools and the pinned GitHub Actions.
+# Matterbridge and wyze-sdk are not listed in package.json (Matterbridge refuses plugins
+# that depend on it), so they are not covered here: the weekly test run in test.yml
+# checks the newest Matterbridge 3.x and wyze-sdk instead.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '09:00'
+      timezone: America/New_York
+    cooldown:
+      default-days: 3            # skip releases younger than 3 days (yanked/compromised versions)
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'deps(dev)'
+    groups:
+      dev-tools:                 # one PR for minor/patch bumps of eslint, typescript, etc.
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # Types stay on the oldest Node the plugin supports (engines: Node 22).
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+      time: '09:00'
+      timezone: America/New_York
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: 'ci'
+    groups:
+      actions:                   # one PR for all action bumps; keeps the SHA pins and their # vX comments in step
+        patterns: ['*']
