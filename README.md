@@ -1,4 +1,8 @@
-# <img src="matterbridge.svg" alt="Matterbridge Logo" width="64px" height="64px">&nbsp;&nbsp;&nbsp;matterbridge-wyze-robovac-plus
+<p align="center">
+  <img alt="Wyze RoboVac Plus" src="https://raw.githubusercontent.com/zmanuel1234/wyze-robovac-matterbridge/main/branding/matterbridge-wyze-robovac-plus.svg" width="150">
+</p>
+
+# matterbridge-wyze-robovac-plus
 
 [![npm](https://img.shields.io/npm/v/matterbridge-wyze-robovac-plus)](https://www.npmjs.com/package/matterbridge-wyze-robovac-plus)
 [![npm](https://img.shields.io/npm/dt/matterbridge-wyze-robovac-plus)](https://www.npmjs.com/package/matterbridge-wyze-robovac-plus)
