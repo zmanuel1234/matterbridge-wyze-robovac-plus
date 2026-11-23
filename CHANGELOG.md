@@ -88,6 +88,7 @@ No new settings; with your current config, 1.3.0 behaves like 1.2.0. Check the N
 
 - **Supported Node.js: 22 (22.19 or later), 24 and 26**, as for the author's Homebridge plugins (was any 22 and 24). Node 26 is newly listed (Matterbridge supports it); CI tests the plugin on 22, 24 and 26.
 - Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests. Lint also refuses `any` in the plugin's code: settings, the saved vacuum and run modes, and the build information are read as `unknown` and checked.
+- Development only: the same release and CI workflows as the author's other plugins. Publishing a GitHub release publishes it to npm (with trusted publishing; the package and its checksum are added to the release); each repository's checks are its `verify`, `test:matrix` and `release:check` scripts. Releases now start from a GitHub release (Actions → Release → Run workflow is gone), test versions other than `-dev-` go to npm's `beta` tag (was `next`), and the release no longer carries `tools/pi-update.sh` and `tools/migrate-to-plus.sh` (they're in the repository).
 
 ### ** Fixed **
 
