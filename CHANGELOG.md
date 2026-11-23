@@ -80,12 +80,18 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 - The package ships only what the plugin needs (`files` in package.json): compiled code, Python helpers, settings schema, sample config, README, CHANGELOG, LICENSE. No source maps, type declarations or author tooling.
 - Removed the original author's publish script, CODEOWNERS, devcontainer, legacy .eslintrc, unused tsconfig.production.json and donation image.
 
-## [Unreleased]
+## [1.3.0] - 2026-11-22
+
+No new settings; with your current config, 1.3.0 behaves like 1.2.0. Check the Node.js version Matterbridge runs on before updating (below).
 
 ### ** Changed **
 
-- Supported Node.js: 22 (22.19 or later), 24 and 26, as for the author's Homebridge plugins; Node 26 is newly listed (Matterbridge supports it) and tested in CI with 22 and 24.
-- Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests.
+- **Supported Node.js: 22 (22.19 or later), 24 and 26**, as for the author's Homebridge plugins (was any 22 and 24). Node 26 is newly listed (Matterbridge supports it); CI tests the plugin on 22, 24 and 26.
+- Development only, nothing changes for users: TypeScript 6.0, and the same ESLint setup as the author's Homebridge plugins, which checks for likely bugs (unhandled promises and similar) instead of formatting, and now also covers the tests. Lint also refuses `any` in the plugin's code: settings, the saved vacuum and run modes, and the build information are read as `unknown` and checked.
+
+### ** Fixed **
+
+- A setting that isn't text in a hand-edited config (an object or a list where the password, API key or Python path goes) is treated as not set, so the missing-setting error names it, instead of being sent to Wyze as the text "[object Object]". A number still counts as its text.
 
 ## [1.2.0] - 2026-11-11
 

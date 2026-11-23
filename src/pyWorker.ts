@@ -116,7 +116,7 @@ export class PyWorker {
   private answer(child : ChildProcessWithoutNullStreams, line : string) {
     let msg : { id? : number, ok? : boolean, out? : string, err? : string };
     try {
-      msg = JSON.parse(line);
+      msg = JSON.parse(line) as typeof msg;   // our own helper's answer (wyze_worker.py)
     } catch {
       this.opts.log(`Wyze helper sent an unreadable line: ${line.slice(0, 200)}`);
       return;
