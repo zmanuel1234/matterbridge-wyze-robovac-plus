@@ -11,7 +11,7 @@ import { ServerNode } from '@matter/node';
 import { DeviceTypeId, VendorId } from '@matter/types/datatype';
 import { AnsiLogger, LogLevel } from 'matterbridge/logger';
 import initializePlugin from '../dist/index.js';
-import { fakeWyze, PYTHON, sleep } from './setup.mjs';
+import { fakeWyze, PYTHON, ROOT, sleep } from './setup.mjs';
 
 // Short waits for the floor-switch retry in vacuumStartSweep.py.
 process.env.WYZE_MAP_SWITCH_POLL = '0.2';
@@ -582,6 +582,45 @@ test('status loop: refreshes rooms only when docked and due, and stops on shutdo
   assert.equal(await run('IDLE', true, 1), 0);
   assert.equal(await run('SWEEPING', false, 7), 0);
   p.refreshRooms = orig;
+});
+
+test('settings that aren\'t text (a hand-edited config) are no setting, not "[object Object]"', () => {
+  const saved = { ...p.config };
+  try {
+    p.config.password = { secret: 'x' };
+    p.config.key_id = 12345;
+    p.config.api_key = ['a'];
+    assert.equal(p.textSetting('password'), '');
+    assert.equal(p.textSetting('key_id'), '12345', 'a number counts as its text');
+    assert.equal(p.textSetting('api_key'), '');
+    assert.equal(p.textSetting('username'), 'me');
+    assert.equal(p.textSetting('notASetting'), '');
+  } finally {
+    Object.assign(p.config, saved);
+  }
+});
+
+test('the vacuum saved for an offline start: read back, and a damaged file is ignored', () => {
+  const file = p.vacuumFile();
+  const before = fs.existsSync(file) ? fs.readFileSync(file) : null;
+  try {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify({ nickname: 'Robo', mac: 'JA_RO2_ABC' }));
+    assert.deepEqual(p.readLastVacuum(), { nickname: 'Robo', mac: 'JA_RO2_ABC' });
+    for (const bad of ['{not json', 'null', '[]', JSON.stringify({ nickname: 'Robo' }), JSON.stringify({ nickname: 1, mac: 'x' }), JSON.stringify({ nickname: 'R', mac: '' })]) {
+      fs.writeFileSync(file, bad);
+      assert.equal(p.readLastVacuum(), undefined, bad);
+    }
+  } finally {
+    if (before) fs.writeFileSync(file, before); else fs.rmSync(file, { force: true });
+  }
+});
+
+test('the first log line names the version and how it was built', () => {
+  const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+  const line = p.buildInfo();
+  assert.ok(line.startsWith(`${version} (`), line);
+  assert.match(line.slice(version.length), /^ \((local build|GitHub release v[^,]+, commit [0-9a-f]{7}, built \d{4}-\d{2}-\d{2})\)$/);
 });
 
 test('no errors logged', () => {

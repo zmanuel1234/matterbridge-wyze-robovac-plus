@@ -156,21 +156,21 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       delete config[old];
     }
     this.worker = new PyWorker({
-      python: String(this.config.pythonPath || 'python3'),
+      python: this.textSetting('pythonPath') || 'python3',
       script: path.join(this.helperDir(), 'wyze_worker.py'),
       secrets: () => ({
-        WYZE_EMAIL: String(this.config.username ?? ''),
-        WYZE_PASSWORD: String(this.config.password ?? ''),
-        WYZE_KEY_ID: String(this.config.key_id ?? ''),
-        WYZE_API_KEY: String(this.config.api_key ?? ''),
-        WYZE_TOTP_KEY: String(this.config.totpKey ?? ''),
+        WYZE_EMAIL: this.textSetting('username'),
+        WYZE_PASSWORD: this.textSetting('password'),
+        WYZE_KEY_ID: this.textSetting('key_id'),
+        WYZE_API_KEY: this.textSetting('api_key'),
+        WYZE_TOTP_KEY: this.textSetting('totpKey'),
         WYZE_TOKEN_FILE: this.tokenFile(),
       }),
       timeoutMs: 90_000,
       log: (m) => this.log.info(m),
     });
 
-    const missing = ['username', 'password', 'key_id', 'api_key'].filter((k) => !String(config[k] ?? '').trim());
+    const missing = ['username', 'password', 'key_id', 'api_key'].filter((k) => !this.textSetting(k).trim());
     if (missing.length > 0) {
       this.log.error(`Missing required setting(s): ${missing.join(', ')}. ` +
         'A login will fail unless a valid saved token already exists.');
@@ -771,8 +771,9 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
 
   readLastVacuum() : { nickname : string, mac : string } | undefined {
     try {
-      const v = JSON.parse(readFileSync(this.vacuumFile(), 'utf8'));
-      return typeof v?.nickname === 'string' && typeof v?.mac === 'string' && v.mac ? { nickname: v.nickname, mac: v.mac } : undefined;
+      const v : unknown = JSON.parse(readFileSync(this.vacuumFile(), 'utf8'));
+      const { nickname, mac } = (v ?? {}) as { nickname? : unknown, mac? : unknown };
+      return typeof nickname === 'string' && typeof mac === 'string' && mac ? { nickname, mac } : undefined;
     } catch {
       return undefined;
     }
@@ -860,18 +861,27 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
   // by the release workflow, which adds build-info.json; "1.0.12 (local build)" otherwise.
   buildInfo() : string {
     const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-    const read = (f : string) => {
+    const read = (f : string) : Record<string, unknown> | undefined => {
       try {
-        return JSON.parse(readFileSync(path.join(root, f), 'utf8'));
+        const data : unknown = JSON.parse(readFileSync(path.join(root, f), 'utf8'));
+        return data && typeof data === 'object' ? data as Record<string, unknown> : undefined;
       } catch {
         return undefined;
       }
     };
-    const version = read('package.json')?.version ?? '?';
+    const text = (v : unknown) => (typeof v === 'string' ? v : '');
+    const version = text(read('package.json')?.version) || '?';
     const b = read('build-info.json');
-    return b?.commit
-      ? `${version} (GitHub release ${b.tag}, commit ${String(b.commit).slice(0, 7)}, built ${String(b.built).slice(0, 10)})`
+    return text(b?.commit)
+      ? `${version} (GitHub release ${text(b?.tag)}, commit ${text(b?.commit).slice(0, 7)}, built ${text(b?.built).slice(0, 10)})`
       : `${version} (local build)`;
+  }
+
+  // A text setting as written in the config; a number counts as its text. Anything else (an object
+  // or list from a hand-edited file) is no setting, rather than the text "[object Object]".
+  textSetting(key : string) : string {
+    const v : unknown = this.config[key];
+    return typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '';
   }
 
   // The py_helpers folder shipped with this plugin (dist/../py_helpers).
@@ -880,7 +890,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
   }
 
   tokenFile() : string {
-    const configured = String(this.config.tokenFile ?? '').trim();
+    const configured = this.textSetting('tokenFile').trim();
     if (configured) {
       return configured.startsWith('~/') ? path.join(homedir(), configured.slice(2)) : configured;
     }
@@ -1200,9 +1210,10 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       return { modes: out, lastShown: C.RUN_DOCK };   // first start
     }
     try {
-      const data = JSON.parse(text);
+      const data = JSON.parse(text) as { modes? : unknown, lastShown? : unknown } | null;
+      const modes = data?.modes && typeof data.modes === 'object' ? data.modes as Record<string, unknown> : {};
       const seen = new Set<number>();   // a number used twice (hand edit) keeps only its first room
-      for (const [key, v] of Object.entries(data?.modes ?? {})) {
+      for (const [key, v] of Object.entries(modes)) {
         const e = (typeof v === 'number' ? { mode: v } : v) as { mode? : unknown, label? : unknown };
         const mode = Number(e?.mode);
         if( Number.isInteger(mode) && mode >= C.FIRST_TARGET_MODE && mode <= C.MAX_MODE && !seen.has(mode) ) {
