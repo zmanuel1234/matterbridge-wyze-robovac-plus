@@ -18,7 +18,7 @@ process.env.WYZE_MAP_SWITCH_POLL = '0.2';
 process.env.WYZE_MAP_SWITCH_WAIT = '2';
 
 const W = fakeWyze();
-const S = { Running: 1, Paused: 2, Error: 3, SeekingCharger: 64, Charging: 65, Docked: 66 };
+const S = { Stopped: 0, Running: 1, Paused: 2, Error: 3, SeekingCharger: 64, Charging: 65, Docked: 66 };
 const CLEAN = { 1: 'Standard', 3: 'Quiet', 4: 'Strong' };
 const RVC_CLEAN_MODE = 0x55;
 const SERVICE_AREA = 0x150;
@@ -621,6 +621,51 @@ test('the first log line names the version and how it was built', () => {
   const line = p.buildInfo();
   assert.ok(line.startsWith(`${version} (`), line);
   assert.match(line.slice(version.length), /^ \((local build|GitHub release v[^,]+, commit [0-9a-f]{7}, built \d{4}-\d{2}-\d{2})\)$/);
+});
+
+test('IDLE away from the dock (standby) shows as Stopped, not Docked (1.3.1)', async () => {
+  p.commandGraceUntil = 0;
+  const cases = [
+    [{ mode: 'IDLE', battery: 60, charging: false, status: 'STANDBY' }, S.Stopped, 1],
+    [{ mode: 'IDLE', battery: 100, charging: false, status: 'DOCKED' }, S.Docked, 1],
+    [{ mode: 'IDLE', battery: 70, charging: true, status: 'STANDBY' }, S.Charging, 1],   // charging is always docked
+    [{ mode: 'IDLE', battery: 100, charging: false, status: null }, S.Docked, 1],   // not reported: as before
+  ];
+  for (const [state, opState, mode] of cases) {
+    await poll(state);
+    assert.deepEqual([op(), runMode()], [opState, mode], JSON.stringify(state));
+  }
+  await poll({ status: null, charging: true });
+});
+
+test('Send to Dock works from standby, and is refused only when docked (1.3.1)', async () => {
+  p.commandGraceUntil = 0;
+  await poll({ mode: 'IDLE', battery: 60, charging: false, status: 'STANDBY' });
+  W.clearEvents();
+  await dev.commandHandler.executeHandler('RvcOperationalState.goHome', { request: {} });
+  assert.ok(W.events().includes('dock'), 'the dock command went to Wyze');
+  p.commandGraceUntil = 0;
+  await poll({ mode: 'IDLE', battery: 100, charging: false, status: 'DOCKED' });
+  W.clearEvents();
+  const before = lines.length;
+  await dev.commandHandler.executeHandler('RvcOperationalState.goHome', { request: {} });
+  assert.ok(!W.events().includes('dock'), 'nothing sent to a docked vacuum');
+  assert.ok(lines.slice(before).some((l) => /Return to dock not done: .*already docked/.test(l)));
+  p.commandGraceUntil = 0;
+  await poll({ status: null, charging: true });
+});
+
+test('every suction level has a tag Home shows: Standard = Auto, Quiet, Strong = Max (1.3.1)', () => {
+  const T = { Auto: 0, Quiet: 2, Max: 7, Vacuum: 0x4001 };   // Matter RvcCleanMode mode tags
+  const tags = Object.fromEntries(dev.state.rvcCleanMode.supportedModes.map((m) => [m.label, m.modeTags.map((t) => t.value)]));
+  assert.deepEqual(tags, { Standard: [T.Vacuum, T.Auto], Quiet: [T.Vacuum, T.Quiet], Strong: [T.Vacuum, T.Max] });
+});
+
+test('skip room is refused (Wyze has no such command), not answered OK (1.3.1)', async () => {
+  const before = lines.length;
+  await assert.rejects(dev.commandHandler.executeHandler('ServiceArea.skipArea', { request: { skippedArea: 4 } }),
+    /Wyze has no command to skip a room/);
+  assert.ok(lines.slice(before).some((l) => /Skip '.+' refused: Wyze has no command to skip a room/.test(l)));
 });
 
 test('no errors logged', () => {

@@ -1,7 +1,8 @@
-# Prints "mode:battery_percent:is_charging:fault_name:suction:online:online_since" for the vacuum,
-# e.g. "VacuumMode.IDLE:87:True:None:quiet:True:1762149273" (fault_name / suction are None when
-# not reported; online is None and online_since empty when Wyze doesn't say). While the vacuum
-# is offline, Wyze still reports its last known mode and battery.
+# Prints "mode:battery_percent:is_charging:fault_name:suction:online:online_since:work_status" for
+# the vacuum, e.g. "VacuumMode.IDLE:87:True:None:quiet:True:1762149273:DOCKED" (fault_name / suction
+# / work_status are None when not reported; online is None and online_since empty when Wyze doesn't
+# say). While the vacuum is offline, Wyze still reports its last known mode and battery.
+# work_status tells the two meanings of mode IDLE apart: DOCKED, or STANDBY somewhere in the house.
 from wyze_auth import run, fail, cli, find_vacuum_mac
 
 
@@ -28,6 +29,11 @@ def _online(vacuum):
     return str(bool(value)), since
 
 
+def work_status(vacuum):
+    """Wyze's work status name (DOCKED, STANDBY, CLEANING, ...); None if not reported."""
+    return getattr(getattr(vacuum, "status", None), "name", None)
+
+
 def main(args):
     if len(args) != 1:
         fail("USAGE: getVacuumStatus.py robovac_nickname")
@@ -39,7 +45,8 @@ def main(args):
         # fault_code is a VacuumFaultCode (or None); print just its name, e.g. COLLISION_EXCEPTION
         fault = getattr(vacuum.fault_code, "name", None) or "None"
         online, since = _online(vacuum)
-        print(f"{vacuum.mode}:{vacuum.voltage}:{vacuum.is_charging}:{fault}:{_suction(vacuum)}:{online}:{since}")
+        print(f"{vacuum.mode}:{vacuum.voltage}:{vacuum.is_charging}:{fault}:{_suction(vacuum)}:{online}:{since}"
+              f":{work_status(vacuum)}")
 
     run(body)
 

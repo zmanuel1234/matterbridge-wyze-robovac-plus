@@ -19,7 +19,7 @@ from wyze_sdk import Client  # noqa: E402
 from wyze_sdk.api.devices.vacuums import VacuumsClient  # noqa: E402
 from wyze_sdk.errors import WyzeApiError, WyzeClientConfigurationError  # noqa: E402,F401
 from wyze_sdk.models.devices import VacuumMode  # noqa: E402
-from wyze_sdk.models.devices.vacuums import Vacuum, VacuumFaultCode, VacuumSuctionLevel  # noqa: E402
+from wyze_sdk.models.devices.vacuums import Vacuum, VacuumFaultCode, VacuumStatus, VacuumSuctionLevel  # noqa: E402
 
 assert "mock" not in (wyze_sdk.__file__ or ""), "the fake wyze_sdk from test/mock is on the path"
 problems = []
@@ -38,6 +38,9 @@ for m in ("devices_list", "refresh_token", "vacuums"):
 for m in ("info", "get_maps", "set_current_map", "sweep_rooms", "pause", "clean", "dock", "set_suction_level"):
     need(hasattr(VacuumsClient, m), f"client.vacuums has no '{m}'")
 need({"QUIET", "STANDARD", "STRONG"} <= {s.name for s in VacuumSuctionLevel}, "VacuumSuctionLevel lacks QUIET/STANDARD/STRONG")
+need({"DOCKED", "STANDBY"} <= {s.name for s in VacuumStatus}, "VacuumStatus lacks DOCKED/STANDBY (docked vs standby)")
+need(getattr(Vacuum(mac="m", product_model="JA_RO2", vacuum_work_status=1), "status", None) == VacuumStatus.STANDBY,
+     "Vacuum.status no longer reads vacuum_work_status")
 for m in ("IDLE", "SWEEPING"):
     need(m in VacuumMode.__members__, f"VacuumMode has no {m} (used by the helper scripts)")
 

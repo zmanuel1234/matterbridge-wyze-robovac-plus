@@ -103,6 +103,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
   private starting = false;      // a start or resume is being sent to the vacuum
   private idleOnDock = false;   // last status check: docked, idle and no fault
   private isDocked = true;
+  private workStatus = 'NONE';   // Wyze's work status: DOCKED, STANDBY, ... ('NONE' if not reported)
   private fault : string = 'None';   // Wyze fault name from the last status check, e.g. 'COLLISION_EXCEPTION'
   private offline = false;   // Wyze says the vacuum is not connected (battery dead, switched off, out of Wi-Fi)
   private newRoomsSelected : boolean = false;
@@ -240,10 +241,11 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       this.runModes, // supportedRunModes: Dock, Clean, then one per floor and room
       1, // currentCleanMode
       // Matter requires at least two clean modes. They map to the S200's suction
-      // levels. Mode 2 is skipped on purpose: older Matterbridge versions send
+      // levels. Home lists a clean mode by its intensity tag (Auto, Quiet, Max), so each
+      // has one; without it Standard was missing from Home. Mode 2 is skipped on purpose: older Matterbridge versions send
       // clean-mode changes to the plain 'changeToMode' handler, where 2 means "start".
       [
-        { label: 'Standard', mode: 1, modeTags: [{ value: RvcCleanMode.ModeTag.Vacuum }] },
+        { label: 'Standard', mode: 1, modeTags: [{ value: RvcCleanMode.ModeTag.Vacuum }, { value: RvcCleanMode.ModeTag.Auto }] },
         { label: 'Quiet', mode: 3, modeTags: [{ value: RvcCleanMode.ModeTag.Vacuum }, { value: RvcCleanMode.ModeTag.Quiet }] },
         { label: 'Strong', mode: 4, modeTags: [{ value: RvcCleanMode.ModeTag.Vacuum }, { value: RvcCleanMode.ModeTag.Max }] },
       ], // supportedCleanModes
@@ -326,6 +328,17 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       }
       this.newRoomsSelected = true;
       this.myLogger(`'selectAreas' handler called. Selected areas: ${this.selectedAreas?.join(', ')}`);
+    });
+
+    // Skip room. Matterbridge always offers it, but Wyze has no command to skip a room,
+    // and the plugin can't tell which room the vacuum is in. Refused, so Home isn't told
+    // that the room was skipped while the vacuum carries on cleaning it.
+    this.roboticVacuum.addCommandHandler('skipArea', async ({ request }) => {
+      const { skippedArea } = request as ServiceArea.SkipAreaRequest;
+      const name = this.areaName(skippedArea);
+      this.log.info(`Skip '${name}' refused: Wyze has no command to skip a room. ` +
+        'Pause, or send the vacuum to the dock and start again with the rooms you want.');
+      throw new Error('Wyze has no command to skip a room');
     });
 
     // Registered under the cluster's own name, so a clean-mode change can never land here.
@@ -561,8 +574,8 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       this.lastAppliedState = '';   // write the real state again below
     }
     this.statusFailures = 0;
-    // "mode:battery:is_charging:fault:suction:online:online_since",
-    // e.g. "VacuumMode.IDLE:87:True:None:quiet:True:1762149273"
+    // "mode:battery:is_charging:fault:suction:online:online_since:work_status",
+    // e.g. "VacuumMode.IDLE:87:True:None:quiet:True:1762149273:DOCKED"
     const fields = r.stdout.trim().split(':');
     // While the vacuum is offline Wyze keeps reporting its last known state, which would
     // show in Home as if it were live. Only an explicit 'False' counts: older helpers and
@@ -580,6 +593,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
     this.currentStatus = fields[0];
     this.isDocked = (fields[2] ?? '').toLowerCase() === 'true';
     this.fault = fields[3] ?? 'None';
+    this.workStatus = (fields[7] ?? '').toUpperCase() || 'NONE';
     const suction = (fields[4] ?? '').toLowerCase();
     if( batteryKnown ) {
       this.batteryLevel = battery;
@@ -615,7 +629,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
      * was last shown, so a command just sent from Home isn't undone by a poll that
      * ran before the vacuum reacted.
      */
-    const target = this.matterStateFor(this.currentStatus, this.batteryLevel, this.isDocked);
+    const target = this.matterStateFor(this.currentStatus, this.batteryLevel, this.isDocked, this.workStatus);
     const fault = target && !target.onDock ? this.matterErrorFor(this.fault) : undefined;
     const inGrace = Date.now() < this.commandGraceUntil;
     if( target && target.runMode === RoboVacMatterbridgeDynamicPlatform.RUN_DOCK && !inGrace ) {
@@ -648,7 +662,7 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
     }
     this.oldStatus = this.currentStatus;
 
-    this.idleOnDock = target !== undefined && !target.busy && target.runMode === 1 && !fault;
+    this.idleOnDock = target !== undefined && !target.busy && target.onDock && target.runMode === 1 && !fault;
 
     // Fast checks while cleaning, paused, returning, faulted or just after a Home
     // command; slower while docked (charging, then full).
@@ -901,8 +915,12 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
    * Wyze vacuum mode (as printed by getVacuumStatus.py, e.g. 'VacuumMode.SWEEPING')
    * -> Matter run mode (1 Idle, 2 Cleaning) and RVC operational state.
    * Mode names come from wyze_sdk.models.devices.vacuums.VacuumMode.
+   * IDLE means docked or on standby somewhere in the house (left paused for a while, or
+   * stopped by a fault that cleared): Wyze's work status (DOCKED / STANDBY) tells them
+   * apart, and charging always means docked. Shown as Docked, the vacuum would get no
+   * "Send to Dock" in Home; Stopped keeps it.
    */
-  matterStateFor(status : string, battery : number, onDock : boolean)
+  matterStateFor(status : string, battery : number, onDock : boolean, workStatus = 'NONE')
     : { runMode : number, opState : number, busy : boolean, onDock : boolean, label : string } | undefined {
     const S = RvcOperationalState.OperationalState;
     switch( status.replace(/^VacuumMode\./, '') ) {
@@ -924,6 +942,9 @@ export class RoboVacMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatf
       case 'QUICK_MAPPING_DOCKED_NOT_COMPLETE':
         return { runMode: 2, opState: S.Charging, busy: false, onDock: true, label: 'charging, and will resume cleaning' };
       case 'IDLE':
+        if( !onDock && workStatus !== 'NONE' && workStatus !== 'DOCKED' ) {
+          return { runMode: 1, opState: S.Stopped, busy: false, onDock: false, label: 'stopped away from the dock' };
+        }
         return onDock && battery < 100
           ? { runMode: 1, opState: S.Charging, busy: false, onDock: true, label: 'docked and charging' }
           : { runMode: 1, opState: S.Docked, busy: false, onDock: true, label: 'docked' };
