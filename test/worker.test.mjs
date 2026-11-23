@@ -21,19 +21,19 @@ after(() => { workers.forEach((w) => w.stop()); W.cleanup(); });
 
 test('status, refused command, unknown command, usage error', async () => {
   const w = worker();
-  assert.deepEqual(await w.request('getVacuumStatus', [NICK]), { ok: true, stdout: 'VacuumMode.IDLE:90:True:None:None:None:\n', stderr: '' });
+  assert.deepEqual(await w.request('getVacuumStatus', [NICK]), { ok: true, stdout: 'VacuumMode.IDLE:90:True:None:None:None::None\n', stderr: '' });
   assert.deepEqual(await w.request('vacuumPauseSweep', [NICK]), { ok: false, stdout: '', stderr: 'RoboVac is docked (not sweeping)....' });
   assert.equal((await w.request('nope', [])).stderr, "Unknown helper command 'nope'");
   assert.match((await w.request('vacuumSetSuction', ['x'])).stderr, /^USAGE: vacuumSetSuction.py/);
   W.set({ suction: 'quiet', battery: 42 });
-  assert.equal((await w.request('getVacuumStatus', [NICK])).stdout, 'VacuumMode.IDLE:42:True:None:quiet:None:\n');
+  assert.equal((await w.request('getVacuumStatus', [NICK])).stdout, 'VacuumMode.IDLE:42:True:None:quiet:None::None\n');
   // Wyze's connection state and when it last changed (seconds since the epoch)
   W.set({ online: false, online_since: 1762149619 });
-  assert.equal((await w.request('getVacuumStatus', [NICK])).stdout, 'VacuumMode.IDLE:42:True:None:quiet:False:1762149619\n');
+  assert.equal((await w.request('getVacuumStatus', [NICK])).stdout, 'VacuumMode.IDLE:42:True:None:quiet:False:1762149619:None\n');
   W.set({ online: true });
-  assert.match((await w.request('getVacuumStatus', [NICK])).stdout, /:quiet:True:1762149619\n$/);
+  assert.match((await w.request('getVacuumStatus', [NICK])).stdout, /:quiet:True:1762149619:None\n$/);
   W.set({ online: null });   // reported without a value: unknown, treated as online
-  assert.match((await w.request('getVacuumStatus', [NICK])).stdout, /:quiet:None:\n$/);
+  assert.match((await w.request('getVacuumStatus', [NICK])).stdout, /:quiet:None::None\n$/);
 });
 
 test('a warning logged by wyze-sdk does not turn a successful command into a failure', async () => {

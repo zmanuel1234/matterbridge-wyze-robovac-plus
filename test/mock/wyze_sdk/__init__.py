@@ -8,7 +8,7 @@ tokens, count logins and see which commands were sent ("events"). Keys:
   password            the account password a full login must match
   mode, battery,      what vacuums.info() reports (mode is a VacuumMode name)
   charging, fault,
-  suction
+  suction, status     status: Wyze's work status name (DOCKED, STANDBY, ...); absent: not reported
   maps                optional [{"name": floor, "rooms": [...]}, ...]; like the real
                       wyze-sdk, "rooms": null and a null floor or room name give None
   no_current_map      true: info() has current_map None
@@ -97,6 +97,7 @@ class _Vacuums:
             mode=VacuumMode[d.get("mode", "IDLE")],
             voltage=d.get("battery", 50),
             is_charging=d.get("charging", True),
+            status=NS(name=d["status"]) if d.get("status") else None,
             fault_code=NS(name=d["fault"]) if d.get("fault") else None,
             clean_level=NS(name=d["suction"].upper()) if d.get("suction") else None,
             product=NS(model="JA_RO2"),

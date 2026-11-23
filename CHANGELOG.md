@@ -80,6 +80,19 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 - The package ships only what the plugin needs (`files` in package.json): compiled code, Python helpers, settings schema, sample config, README, CHANGELOG, LICENSE. No source maps, type declarations or author tooling.
 - Removed the original author's publish script, CODEOWNERS, devcontainer, legacy .eslintrc, unused tsconfig.production.json and donation image.
 
+## [1.3.1] - 2026-11-23
+
+No new settings; nothing to change in your config.
+
+### ** Fixed **
+
+- A vacuum on standby away from its dock (for example left paused for a while) showed as **Docked** in Home, so Home offered no **Send to Dock**, and the dock command from Home, Siri or Alexa was refused with "RoboVac is already docked". Wyze reports both as mode IDLE; the plugin now also reads Wyze's work status (docked or standby). Away from the dock the vacuum shows as **Stopped**, and Send to Dock works. Only a vacuum that is really on its dock (or charging) refuses it. Without the work status, as before.
+- Home showed only two suction levels, **Quiet** and **Max** (Strong): Home lists a cleaning mode by its intensity tag, and Standard had none, so once Quiet or Max was chosen there was no way back to Standard from Home. Standard now has the Auto tag and shows in Home as **Auto**. Alexa and the logs still say Standard, Quiet and Strong.
+
+### ** Changed **
+
+- **Skip room** from Home is refused, with a line in the log, instead of being answered OK while the vacuum carried on cleaning that room: Wyze has no command to skip a room.
+
 ## [1.3.0] - 2026-11-22
 
 No new settings; with your current config, 1.3.0 behaves like 1.2.0. Check the Node.js version Matterbridge runs on before updating (below).
