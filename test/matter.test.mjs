@@ -618,7 +618,9 @@ test('the vacuum saved for an offline start: read back, and a damaged file is ig
 
 test('the first log line names the version and how it was built', () => {
   const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
-  assert.match(p.buildInfo(), new RegExp(`^${version.replace(/\./g, '\\.')} \\((local build|GitHub release v[^,]+, commit [0-9a-f]{7}, built \\d{4}-\\d{2}-\\d{2})\\)$`));
+  const line = p.buildInfo();
+  assert.ok(line.startsWith(`${version} (`), line);
+  assert.match(line.slice(version.length), /^ \((local build|GitHub release v[^,]+, commit [0-9a-f]{7}, built \d{4}-\d{2}-\d{2})\)$/);
 });
 
 test('no errors logged', () => {
