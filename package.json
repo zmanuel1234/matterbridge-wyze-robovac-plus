@@ -48,7 +48,10 @@
     "build": "node -e \"for (const p of ['dist','tsconfig.tsbuildinfo']) require('fs').rmSync(p, { recursive: true, force: true })\" && tsc",
     "test": "npm run build && node --test --test-concurrency=1 test/*.test.mjs",
     "test:sdk": "python3 test/sdk_contract.py",
-    "prepack": "npm run check:deps && npm run lint && npm run build"
+    "prepack": "npm run check:deps && npm run lint && npm run build",
+    "verify": "npm run dev:matterbridge && npm run check:deps && npm run lint && npm test",
+    "test:matrix": "npm run dev:matterbridge && npm test",
+    "release:check": "npm run verify && node tools/build-info.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

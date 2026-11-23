@@ -1,43 +1,35 @@
-name: Tests
+# This repository only: the Python side of the plugin (its helpers talk to Wyze through wyze-sdk),
+# besides the shared ci.yml (which runs the tests with Ubuntu's Python 3.12).
+name: Python
 
 on:
   push:
-    branches: ['**']   # tags run these tests through release.yml instead
   pull_request:
   workflow_dispatch:
-  workflow_call:       # used by release.yml
   schedule:
-    - cron: '17 6 * * 1'   # Mondays: catches breakage from new Matterbridge 3.x or wyze-sdk releases
+    - cron: '17 6 * * 1'   # Mondays: catches breakage from new wyze-sdk releases
 
 permissions:
   contents: read
 
 jobs:
-  # Each job runs in Debian with the given Python (GitHub's own Ubuntu machines no longer
-  # offer Python 3.9, the version Raspberry Pi OS 11 has).
-  plugin:
-    name: Plugin (Node ${{ matrix.node }}, Python ${{ matrix.python }})
+  # In Debian with Python 3.9, the version Raspberry Pi OS 11 has (GitHub's own Ubuntu machines
+  # no longer offer it).
+  plugin-python39:
+    name: Plugin tests on Python 3.9 (as on the Pi)
     runs-on: ubuntu-latest
-    container: python:${{ matrix.python }}-bookworm
+    container: python:3.9-bookworm
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ['22', '24', '26']  # every Node version the plugin supports
-        python: ['3.9', '3.12']   # 3.9 is what the Pi runs
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1       # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1     # v7.1.0
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts --no-fund --no-audit
-      - run: npm run dev:matterbridge
-      - run: npm run check:deps
-      - run: npm run lint
-      - run: npm test
+      - run: npm run test:matrix
         env:
           PYTHON: python3
 

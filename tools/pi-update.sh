@@ -7,7 +7,7 @@
 #   sudo wyze-plugin-update v1.0.12    install that release (also to go back to an older one)
 #   sudo wyze-plugin-update restore 1.0.11   put back a version this script backed up, and restart
 #
-# Releases are built and tested by GitHub (.github/workflows/release.yml); this script only
+# Releases are built and tested by GitHub (.github/workflows/publish.yml); this script only
 # installs them, after checking the SHA-256 checksum published with the release. The previous
 # version is copied to /opt/matterbridge/plugin-backup/<version> first.
 #
