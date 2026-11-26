@@ -1,0 +1,57 @@
+// Shared oxlint setup (replaces the shared eslint.config.mjs): keep the copies the same apart from
+// the "This repository" override at the end.
+//
+// It checks for bugs, not formatting. TypeScript in src/ gets the type-aware rules (run by
+// oxlint-tsgolint on TypeScript 7), mainly the promise checks: a promise that is neither awaited
+// nor given a .catch() turns a failure into an unhandled rejection, which can stop the whole bridge.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["dist/**", "node_modules/**", "coverage/**"],
+  "env": { "builtin": true, "node": true },
+  "options": {
+    "typeAware": true,
+    "reportUnusedDisableDirectives": "error",
+    "maxWarnings": 0
+  },
+  "plugins": ["eslint", "typescript", "oxc", "unicorn", "import", "node", "promise"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    // Other likely bugs
+    "eslint/eqeqeq": ["error", "smart"],
+    "eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrors": "none" }]
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        // Promises
+        "typescript/no-floating-promises": "error",
+        "typescript/no-misused-promises": "error",
+        "typescript/await-thenable": "error",
+        // Not require-await: `async` without `await` is how a function turns its throws into
+        // rejections for callers that use .catch().
+        "eslint/no-console": "error", // log through the platform's logger
+        // Consistency
+        "typescript/consistent-type-imports": ["error", { "fixStyle": "inline-type-imports" }],
+        // Device APIs hand back loosely typed data; `any` is allowed where it's honest.
+        "typescript/no-explicit-any": "off"
+      }
+    },
+    // ---- This repository ----
+    // No `any`: values from Wyze, Matterbridge, the config and saved files get a type (or `unknown`, checked).
+    {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        "typescript/no-explicit-any": "error",
+        "typescript/no-unsafe-argument": "error",
+        "typescript/no-unsafe-assignment": "error",
+        "typescript/no-unsafe-call": "error",
+        "typescript/no-unsafe-member-access": "error",
+        "typescript/no-unsafe-return": "error",
+        "typescript/no-base-to-string": "error"
+      }
+    }
+  ]
+}
