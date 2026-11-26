@@ -80,6 +80,14 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 - The package ships only what the plugin needs (`files` in package.json): compiled code, Python helpers, settings schema, sample config, README, CHANGELOG, LICENSE. No source maps, type declarations or author tooling.
 - Removed the original author's publish script, CODEOWNERS, devcontainer, legacy .eslintrc, unused tsconfig.production.json and donation image.
 
+## [1.3.3] - 2026-11-26
+
+No change to how the plugin works.
+
+### ** Changed **
+
+- Development only: CI runs the tests on Node 22, 24 and 26 in a single check.
+
 ## [1.3.2] - 2026-11-25
 ## [1.3.1] - 2026-11-23
 
