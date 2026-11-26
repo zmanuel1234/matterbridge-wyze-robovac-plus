@@ -86,7 +86,7 @@ No change to how the plugin works.
 
 ### ** Changed **
 
-- Development only: CI retries npm's package signature check up to 3 times, because npm's registry sometimes answers it with an invalid response.
+- Development only: oxlint pinned to 1.94.0 (and oxlint-tsgolint to 7.0.2007), the versions matterbridge-plugin-template uses: npm's registry kept sending CI an invalid signature answer for oxlint 1.95.0's Linux binary. CI also retries that signature check up to 3 times.
 
 ## [1.3.4] - 2026-11-26
 
