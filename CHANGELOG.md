@@ -80,6 +80,14 @@ Housekeeping only; the plugin behaves exactly as 1.0.1-secure.3.
 - The package ships only what the plugin needs (`files` in package.json): compiled code, Python helpers, settings schema, sample config, README, CHANGELOG, LICENSE. No source maps, type declarations or author tooling.
 - Removed the original author's publish script, CODEOWNERS, devcontainer, legacy .eslintrc, unused tsconfig.production.json and donation image.
 
+## [1.3.5] - 2026-11-26
+
+No change to how the plugin works.
+
+### ** Changed **
+
+- Development only: oxlint pinned to 1.94.0 (and oxlint-tsgolint to 7.0.2007), the versions matterbridge-plugin-template uses: npm's registry kept sending CI an invalid signature answer for oxlint 1.95.0's Linux binary. CI also retries that signature check up to 3 times.
+
 ## [1.3.4] - 2026-11-26
 
 No change to how the plugin works.
