@@ -4,7 +4,7 @@
 # Weekly update pull requests; CI runs on each one, and each still needs a review before merging.
 #
 # This repository: Matterbridge and wyze-sdk are not in package.json (Matterbridge refuses
-# plugins that list it), so they are not covered here: the weekly scheduled run in test.yml
+# plugins that list it), so they are not covered here: the weekly scheduled run in python.yml
 # tests the newest Matterbridge 3.x and wyze-sdk instead.
 version: 2
 
