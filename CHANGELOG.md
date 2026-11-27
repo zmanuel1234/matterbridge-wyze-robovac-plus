@@ -1,5 +1,14 @@
 # <img src="matterbridge.svg" alt="Matterbridge Logo" width="64px" height="64px">&nbsp;&nbsp;&nbsp;matterbridge-wyze-robovac-plus
  
+## 1.3.8 - 2026-11-27
+
+No change to how the plugin works.
+
+### Changed
+
+- npm: keywords for the controllers the vacuum works with (Apple Home, Alexa, SmartThings, Home Assistant) and for the S200. The README has CI and license badges.
+- Development only: CI and releases use the same shared workflows as the other plugins (cached packages, release notes from this changelog); oxlint 1.94.0 → 1.95.0; the changelog lists the newest release first.
+
 ## 1.3.7 - 2026-11-26
 
 No change to how the plugin works.
