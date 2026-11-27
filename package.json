@@ -46,7 +46,13 @@
     "Wyze",
     "RoboVac",
     "S200",
-    "robot vacuum"
+    "robot-vacuum",
+    "wyze-s200",
+    "apple-home",
+    "homekit",
+    "alexa",
+    "smartthings",
+    "home-assistant"
   ],
   "engines": {
     "node": "^22.19.0 || ^24.0.0 || ^26.0.0"
