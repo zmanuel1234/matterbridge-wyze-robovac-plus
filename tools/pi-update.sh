@@ -16,7 +16,7 @@
 # and never put on a command line.
 set -euo pipefail
 
-REPO="zmanuel1234/wyze-robovac-matterbridge"
+REPO="zmanuel1234/matterbridge-wyze-robovac-plus"
 TOKEN_FILE="/etc/wyze-plugin-update/token"
 MB_HOME="/opt/matterbridge"
 PREFIX="$MB_HOME/.npm-global"

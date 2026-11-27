@@ -1,5 +1,14 @@
 # <img src="matterbridge.svg" alt="Matterbridge Logo" width="64px" height="64px">&nbsp;&nbsp;&nbsp;matterbridge-wyze-robovac-plus
  
+## 1.3.9 - 2026-11-27
+
+No change to how the plugin works.
+
+### Changed
+
+- The GitHub repository is renamed to **matterbridge-wyze-robovac-plus**, the same name as the npm package. The links in package.json, the README, SECURITY.md, NOTICE, the issue templates and the Pi scripts (`tools/pi-update.sh`, `tools/migrate-to-plus.sh`) use the new name; the old address still redirects there.
+- Development only: after a stable release, the release workflow removes npm's `beta` tag when it points at an older version (shared with the other plugins).
+
 ## 1.3.8 - 2026-11-27
 
 No change to how the plugin works.

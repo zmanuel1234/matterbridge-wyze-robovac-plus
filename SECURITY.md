@@ -8,7 +8,7 @@ Only the latest release of `matterbridge-wyze-robovac-plus` on npm gets security
 
 Please don't open a public issue. Report it privately on GitHub instead: the repository's
 **Security** tab, then **Report a vulnerability**
-(<https://github.com/zmanuel1234/wyze-robovac-matterbridge/security/advisories/new>).
+(<https://github.com/zmanuel1234/matterbridge-wyze-robovac-plus/security/advisories/new>).
 
 Say which version you use, what an attacker could do, and how to reproduce it. I aim to answer
 within a week. A fix comes out as a new release, with a GitHub security advisory that credits you

@@ -17,7 +17,7 @@ set -euo pipefail
 OLD=matterbridge-wyze-robovac
 NEW=matterbridge-wyze-robovac-plus
 RELEASE_TAG=v1.1.0
-REPO="zmanuel1234/wyze-robovac-matterbridge"
+REPO="zmanuel1234/matterbridge-wyze-robovac-plus"
 TOKEN_FILE="/etc/wyze-plugin-update/token"
 MB_HOME="/opt/matterbridge"
 PREFIX="$MB_HOME/.npm-global"
