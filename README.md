@@ -5,7 +5,7 @@
 # matterbridge-wyze-robovac-plus
 
 [![npm](https://img.shields.io/npm/v/matterbridge-wyze-robovac-plus)](https://www.npmjs.com/package/matterbridge-wyze-robovac-plus)
-[![npm](https://img.shields.io/npm/dt/matterbridge-wyze-robovac-plus)](https://www.npmjs.com/package/matterbridge-wyze-robovac-plus)
+[![npm downloads](https://img.shields.io/npm/dt/matterbridge-wyze-robovac-plus)](https://www.npmjs.com/package/matterbridge-wyze-robovac-plus)
 [![CI](https://github.com/zmanuel1234/matterbridge-wyze-robovac-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/zmanuel1234/matterbridge-wyze-robovac-plus/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zmanuel1234/matterbridge-wyze-robovac-plus)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-zmanuel1234-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zmanuel1234)
@@ -136,7 +136,9 @@ Test versions are numbered like `1.2.0-dev-1` and published to npm under the `de
 ```bash
 npm install
 npm run dev:matterbridge   # Matterbridge for type checking; not saved in package.json, because Matterbridge refuses plugins that list it
+npm run check              # type checking
 npm test                   # builds, then runs the tests against a fake Wyze account (Python 3 needed, no Wyze login)
+npm run verify             # everything CI checks
 npm pack                   # checks dependencies, lints, builds and writes the .tgz
 ```
 

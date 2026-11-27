@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in matterbridge-wyze-robovac-plus isn't working
+description: Something doesn't work as the README describes.
 labels: [bug]
 body:
   - type: markdown
@@ -78,3 +78,14 @@ body:
     attributes:
       label: Anything else
       description: Screenshots, which rooms or floors were selected, whether it worked in an earlier version, etc.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I'm on the latest version of the plugin.
+          required: true
+        - label: I searched the existing issues.
+          required: true
+        - label: There are no secrets in what I pasted.
+          required: true
