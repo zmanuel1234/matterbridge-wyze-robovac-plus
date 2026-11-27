@@ -1,5 +1,8 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
-  - name: Setup instructions and settings
+  - name: Security problem
+    url: https://github.com/zmanuel1234/matterbridge-wyze-robovac-plus/security/advisories/new
+    about: Report it privately, not as an issue.
+  - name: Setup and settings
     url: https://github.com/zmanuel1234/matterbridge-wyze-robovac-plus#readme
-    about: Requirements, every setting, and how updates work.
+    about: "Requirements, every setting, and how updates work."
