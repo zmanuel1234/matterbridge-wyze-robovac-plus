@@ -1,4 +1,4 @@
-# <img src="matterbridge.svg" alt="Matterbridge Logo" width="64px" height="64px">&nbsp;&nbsp;&nbsp;matterbridge-wyze-robovac-plus
+# Changelog
  
 ## 1.3.9 - 2026-11-27
 

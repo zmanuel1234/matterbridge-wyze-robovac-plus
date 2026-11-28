@@ -127,11 +127,13 @@ Thanks again to [Shaun Tarves](https://github.com/shauntarves/wyze-sdk) for the 
 
 Updates are offered in the Matterbridge UI like for any plugin. Releases are published to npm by GitHub Actions (`.github/workflows/publish.yml`, the same in the author's other plugins) when a GitHub release is published. The tag must be `v` followed by the version in `package.json`, the release needs notes (the CHANGELOG section for the version), and **Set as a pre-release** must be ticked exactly for a version with a `-`. The workflow runs `npm run release:check`, adds the package and its `SHA256SUMS` to the release, and publishes that package with npm's trusted publishing: a `-dev-` version to npm's `dev` tag, any other pre-release to `beta`, a stable version to `latest`. **Run workflow** with a release's tag publishes a release that already exists. CI (`.github/workflows/ci.yml`, also shared) runs `npm run verify` on Node 24 and `npm run test:matrix` on Node 22, 24 and 26. Here, `release:check` also writes `build-info.json` (the release and commit), which the plugin's first log line shows. `tools/pi-update.sh` (installed as `wyze-plugin-update`) can still install a GitHub release's package directly, for example to test one before publishing it.
 
+Each version has a section in `CHANGELOG.md`: `## 1.2.3 - date`, an optional one-line summary, then bullets (no Added/Changed/Fixed headings). A release published without notes takes that section as its notes.
+
 The `SHA256SUMS` file comes from the same release, so it shows the download arrived intact, not who built it; the release and the npm package (with provenance) are built by GitHub Actions from the tagged commit.
 
 Test versions are numbered like `1.2.0-dev-1` and published to npm under the `dev` tag (and as a GitHub pre-release), which is where the Matterbridge UI looks for a plugin's development version: install it there, or enter `matterbridge-wyze-robovac-plus@dev` as the plugin to install. Once on a dev version, Matterbridge also offers the next one. A normal version (no `-`) goes to `latest` as before; other pre-release numbers (e.g. `1.2.0-rc.1`) go to `beta`. `wyze-plugin-update` does not treat an older release as an update of a newer test version: to go back, send the vacuum to its dock first, then name the release, e.g. `sudo wyze-plugin-update v1.1.3`.
 
-## Building from source
+## Development
 
 ```bash
 npm install
@@ -143,3 +145,7 @@ npm pack                   # checks dependencies, lints, builds and writes the .
 ```
 
 The tests in `test/` run a real Matter server with the vacuum device, drive it through the plugin's command handlers against a fake wyze-sdk (`test/mock`), exercise the long-running Python helper (timeouts, crashes, token refresh, failed logins, credentials kept out of the process environment), and have Matterbridge's own plugin manager add the packed plugin. `npm run test:sdk`, run with the real wyze-sdk installed, checks that every wyze-sdk name the plugin relies on still exists. GitHub runs all of this on every push and once a week (`.github/workflows/test.yml`), the weekly run with the newest Matterbridge 3.x and wyze-sdk.
+
+## License
+
+Apache-2.0 (see [LICENSE](LICENSE)); based on Rob Coben's matterbridge-wyze-robovac (see [NOTICE](NOTICE)).

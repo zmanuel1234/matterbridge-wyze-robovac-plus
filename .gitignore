@@ -1,32 +1,11 @@
-# .gitignore
-# This file specifies intentionally untracked directories and files that Git should ignore.
-
-# Specific directories that should be ignored
-.vscode/
-coverage/
-dist/
-jest/
+# Shared by the author's plugins (the same block in all of them).
 node_modules/
-temp/
-
-# Specific files that should be ignored
-*.backup
-*.heapsnapshot
-*.heapprofile
-*.tsbuildinfo
+dist/
 *.tgz
 *.log
+.DS_Store
 
-# Package specific directories and files that should be ignored
-
-# Python bytecode caches
-__pycache__/
-*.pyc
-
-# Written by the release workflow only
-build-info.json
-
-# Shared by the author's five plugins: never commit secrets, tokens or keys.
+# Never commit secrets, tokens or keys.
 .env
 .env.*
 .npmrc
@@ -34,3 +13,16 @@ build-info.json
 *.key
 *.p12
 *.pfx
+
+# ---- This repository ----
+.vscode/
+coverage/
+jest/
+temp/
+*.backup
+*.heapsnapshot
+*.heapprofile
+*.tsbuildinfo
+__pycache__/
+*.pyc
+build-info.json
